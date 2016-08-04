@@ -13,7 +13,14 @@
                 success:function (data) {
 //                    alert(data);
 //                    console.log(data);
-                    $("div").append("<p></p>").text(data);
+                    //后面会用到..
+//                    btn = '<button onclick="sendPrivate('+i+')" id=btn_'+i+'>'+data[i]+'</button>'
+//                    alert(data.toString());
+                    var reg=/,/;
+                    var data=data.toString().split(reg);
+                    for (var i=0;i<data.length;i++){
+                        $("#onLine").append('<button onclick="sendPrivate('+i+')"id=btn_'+i+'>'+data[i]+'</button>');
+                    }
                 }
             })
         }
@@ -31,6 +38,10 @@
             socket.emit('public message',$("#msg").val());
 //            socket.emit('private message',$("#id").val(),$("#msg").val());
         }
+        function sendPrivate(i) {
+            var btn='#btn_'+i;
+            alert($(btn).text());
+        }
         function private() {
             socket.emit('private message',$("#id").val(),$("#msg").val());
         }
@@ -43,14 +54,16 @@
     </script>
 </head>
 <body>
-    <p>welcome to chat,</p>
+    <p>welcome to chat,<%=title%></p>
     <ul id="message"></ul>
     <input id="id" type="text" autocomplete="off" placeholder="id"><input id="msg" type="text" autocomplete="off" placeholder="msg"/><br/>
     <button onclick="jump()">sendToAll</button><br/>
     <button onclick="private()">sendPrivate</button><br/>
     <a href="/logout">退出登录</a><br/>
-    <div id="div" style="width: auto;height: auto;min-width: 50px;min-height: 100px; border-style:solid;border-width:1px;border-height:1px;border-color: #00B7FF">
-    </div>
+    <!--<div id="div" style="width: auto;height: auto;min-width: 50px;min-height: 100px; border-style:solid;border-width:1px;border-height:1px;border-color: #00B7FF">-->
+    <!--</div>-->
+    OnlineList,点击刷新
+    <ul id="onLine"></ul>
     <button onclick="get()">ajaxGet</button>
 </body>
 </html>

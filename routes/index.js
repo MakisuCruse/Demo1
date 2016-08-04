@@ -12,10 +12,7 @@ router.get('/', function(req, res) {
     // res.redirect('/index');
 
     if(req.session.user!=null){
-        var userId=req.session.user.id;
-        return res.redirect('chat');
-        //这里需要传递req.session.user.id到chat页面显示自己的信息..
-        // return res.render('chat',{title:userId});
+       return res.redirect('chat');
     }
     // if(userId!=null){
     //     res.render('chat',{title:userId});
@@ -25,7 +22,7 @@ router.get('/', function(req, res) {
 
 });
 router.get('/index',function (req,res) {
-        return res.render('index');
+        return res.render('index',{title:"请登录"});
 });
 router.post('/index',function (req,res) {
     // console.log(req.body.id);
@@ -50,17 +47,17 @@ router.post('/index',function (req,res) {
 });
 router.get('/chat',function (req,res) {
   //页面控制,登陆后才能看到
-  if(req.session.id==null){
-        res.render('index');
+  if(req.session.user==null){
+        res.render('index',{title:"请登录"});
   }
-    res.render('chat');
+    res.render('chat',{title:req.session.user.id});
 
 });
 router.get('/test',function (req,res) {
     return res.render('test');
 });
 router.get('/register',function (req,res) {
-    res.render('register',{user:req.session.user});
+    res.render('register');
 });
 router.post('/register',function (req,res) {
    var id=req.body.id,
@@ -91,7 +88,7 @@ router.post('/register',function (req,res) {
             // req.setRequestHeader('token',token);
             req.session.user=userInfo;
             // res.redirect('/chat');
-            res.render('chat');
+            return  res.redirect('chat');
         })
     })
 });
@@ -108,7 +105,7 @@ router.get('/logout',function (req,res) {
 router.get('/data',function (req,res) {
     // console.log(onLineList);
     // return res.send('dsada');
-    // console.log(arr.toString()+'....');
+    console.log(arr.toString()+'....');
     return res.send(arr.toString());
 });
 

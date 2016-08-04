@@ -30,6 +30,7 @@ io.on('connection',function (socket) {
     onLineList.add(socket.id);
     arr=Array.from(onLineList);
     //
+    // console.log(req.session.user);
     exports.arr=arr;
     console.log(arr);
     socket.emit('onLine',arr);
@@ -49,8 +50,8 @@ io.on('connection',function (socket) {
         onLineList.delete(socket.id);
         arr=Array.from(onLineList);
         // remove(onLineList,socket.id);
-        socket.emit('onLine',arr);
-        console.log(onLineList);
+        // socket.emit('onLine',arr);
+        // console.log(onLineList);
         console.log(--count);
     });
 });
