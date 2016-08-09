@@ -1,7 +1,2 @@
-var str="lkzt,draxler,males";
-var reg=/,/;
-var res=str.split(reg);
-console.log(res);
-for (var i=0;i<res.length;i++){
-    console.log(res[i]);
-}
+var s={'name':'zhang','age':10};
+console.log(s.hasOwnProperty('sex'));

@@ -12,15 +12,18 @@ var session = require('express-session');
 var MongoStore = require('connect-mongo')(session);
 var crypto = require('crypto'),
     User = require('./model/user.js');
+var flash=require('connect-flash');
+app.use(flash());
 app.use(session({
-  secret: settings.cookieSecret,
-  key: settings.db,//cookie name
-  cookie: {maxAge: 1000 * 60 * 60 * 24 * 30},//30 days
-  
-  store: new MongoStore({
+    resave:false,
+    saveUninitialized:true,
+    secret: settings.cookieSecret,
+    key: settings.db,//cookie name
+    cookie: {maxAge: 1000 * 60 * 60 * 24 * 30},//30 days
+    store: new MongoStore({
+      //  chat表示db为哪个
     url: 'mongodb://localhost/chat'
   })
-
 }));
 
 //处理跨域请求

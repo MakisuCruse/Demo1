@@ -33,17 +33,29 @@ io.on('connection',function (socket) {
     // console.log(req.session.user);
     exports.arr=arr;
     console.log(arr);
-    socket.emit('onLine',arr);
+
     socket.on('public message',function (msg) {
-      console.log(msg);
-      io.emit('public message',socket.id+"~~~~"+msg);
+        console.log(msg);
+        io.emit('public message',socket.id+":"+msg);
     });
+
     socket.on('private message',function (id,msg) {
         console.log(msg+' to '+id);
+        // console.log(typeof socket.id);
+        // console.log(typeof id);
+        if(socket.id===id){
+            console.log('equal');
+            socket.to(id).emit('private message','to yourself:'+msg);
+        }else{
+            console.log(socket.id+":"+id+'--------');
+            socket.to(socket.id).emit('private message','to:'+id+':'+msg);
+            socket.to(id).emit('private message',socket.id+':(private message)'+msg);
+        }
         // io.to(socket.id).emit('private message','private message-'+socket.id+':'+msg);
         // var ids=[socket.id,id];
-        io.to(id).emit('private message',msg);
+        // io.to(socket.id).emit('private message',socket.id+':(yourself..)'+msg);
     });
+
     socket.on('disconnect',function(){
         console.log('a user disconnected..');
         // onLineList.remove(socket.id);
@@ -53,6 +65,7 @@ io.on('connection',function (socket) {
         // socket.emit('onLine',arr);
         // console.log(onLineList);
         console.log(--count);
+        console.log(arr);
     });
 });
 

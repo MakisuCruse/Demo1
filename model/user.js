@@ -3,7 +3,7 @@ var mongodb = require('./db');
 function User(user) {
     this.id = user.id;
     this.password = user.password;
-    this.token= user.token;
+    // this.token= user.token;
 }
 module.exports = User;
 
@@ -12,8 +12,8 @@ User.prototype.save = function(callback) {
     //要存入数据库的用户文档
     var user = {
         id: this.id,
-        password: this.password,
-        token: this.token
+        password: this.password
+        // token: this.token
     };
     //打开数据库
     mongodb.open(function (err, db) {
