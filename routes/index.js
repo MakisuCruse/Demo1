@@ -100,6 +100,7 @@ router.post('/index', function (req, res) {
 });
 
 router.get('/chat', function (req, res) {
+    // console.log(req);
     //如果直接登录chat则要验证.
     var token = tokenParson(req);
     console.log('token:'+'-----???'+token);
@@ -204,7 +205,8 @@ router.get('/data', function (req, res) {
     // console.log(onLineList);
     // return res.send('dsada');
     // console.log(arr.toString()+'....');
-    return res.send(arr.toString());
+    
+    return res.send(arr);
 });
 
 
@@ -220,7 +222,7 @@ function tokenParson(req) {
         });
         //因为req.headers.cookie是字符串,要先解析
         if(Cookies.hasOwnProperty('token')){
-            if(Cookies['token']==1){
+            if(Cookies['token']==-1){
                 return null;
             }
             var token = Cookies['token'];
@@ -230,7 +232,6 @@ function tokenParson(req) {
         }
     //cookies中token存在吗???1.不存在->index->登陆2.存在->auto1();
 }
-
 //token->id
 function userInfo(token) {
     var decode = jwt.verify(token, settings.cookieSecret);
@@ -245,10 +246,12 @@ function auto1(token, res) {
     console.log(decode);
     // console.log(decode.id+"------"+decode.password);
     //1.首先判断过期没???下面的有问题
-    /*if (decode.exp <= Date.now()) {
-        console.log('here???');
-        return res.render('index', {title: '请登录'});
-    }*/
+    if (decode.exp<=Date.now()) {
+        console.log('exp???date.now');
+        res.cookie('token',-1);
+        return res.redirect('index');
+    }
+    console.log('exp>>dataNow');
     //没过期 =>看一下token对不对
     var id = decode.id;
     User.get(id, function (err, user) {

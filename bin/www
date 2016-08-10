@@ -7,6 +7,8 @@
 var app = require('../app');
 var debug = require('debug')('Chat:server');
 var http = require('http');
+var jwt=require('jsonwebtoken');
+var settings=require('../settings');
 /**
  * Get port from environment and store in Express.
  */
@@ -25,18 +27,34 @@ var count=0;
 //在线用户的socket.id
 var onLineList=new Set();
 io.on('connection',function (socket) {
-    console.log('a user connected..'+':'+socket.id);
     console.log(++count);
-    onLineList.add(socket.id);
-    arr=Array.from(onLineList);
+    console.log('a user connected..'+':'+socket.id);
+
+    console.log(socket.handshake.headers['cookie']);
+    //1.解析socket=>{token:token,socketId:socketId};
+    var token=tokenParson(socket);
+    console.log('??'+token);
+    console.log(typeof token);
+    if(token==-1||token==null){
+        console.log('need token..');
+        arr=onLineList;
+    }else{
+        // //2.socketId=>token=>Id
+        console.log('here?');
+        var decode=jwt.verify(token,settings.cookieSecret);
+        onLineList.add(decode.id);
+        //3.修改arr=>存放的是id即可;
+        arr=Array.from(onLineList);
+    }
+
     //
     // console.log(req.session.user);
     exports.arr=arr;
     console.log(arr);
-
+    // console.log(socket);
     socket.on('public message',function (msg) {
         console.log(msg);
-        io.emit('public message',socket.id+":"+msg);
+        io.emit('public message',decode.id+":"+msg);
     });
 
     socket.on('private message',function (id,msg) {
@@ -49,7 +67,7 @@ io.on('connection',function (socket) {
         }else{
             console.log(socket.id+":"+id+'--------');
             socket.to(socket.id).emit('private message','to:'+id+':'+msg);
-            socket.to(id).emit('private message',socket.id+':(private message)'+msg);
+            socket.to(id).emit('private message',decode.id+':(private message)'+msg);
         }
         // io.to(socket.id).emit('private message','private message-'+socket.id+':'+msg);
         // var ids=[socket.id,id];
@@ -57,15 +75,18 @@ io.on('connection',function (socket) {
     });
 
     socket.on('disconnect',function(){
+        console.log(--count);
         console.log('a user disconnected..');
         // onLineList.remove(socket.id);
-        onLineList.delete(socket.id);
-        arr=Array.from(onLineList);
+        if(token!=-1&&token!=null){
+            onLineList.delete(decode.id);
+            arr=Array.from(onLineList);
+        }
         // remove(onLineList,socket.id);
         // socket.emit('onLine',arr);
         // console.log(onLineList);
-        console.log(--count);
-        console.log(arr);
+
+        // console.log(arr);
     });
 });
 
@@ -141,4 +162,23 @@ function onListening() {
     ? 'pipe ' + addr
     : 'port ' + addr.port;
   debug('Listening on ' + bind);
+}
+function tokenParson(socket) {
+    var Cookies = {};
+    socket.handshake.headers.cookie.split(';').forEach(function (Cookie) {
+        var parts = Cookie.split('=');
+        // console.log(parts);
+        Cookies[parts[0].trim()] = ( parts[1] || '' ).trim();
+    });
+    //因为req.headers.cookie是字符串,要先解析
+    if(Cookies.hasOwnProperty('token')){
+        if(Cookies['token']===-1){
+            return null;
+        }
+        var token = Cookies['token'];
+        return token;
+    }else{
+        return null;
+    }
+    //cookies中token存在吗???1.不存在->index->登陆2.存在->auto1();
 }
