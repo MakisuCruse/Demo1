@@ -29,7 +29,7 @@ var onLineList=new Set();
 io.on('connection',function (socket) {
     console.log(++count);
     console.log('a user connected..'+':'+socket.id);
-
+    
     console.log(socket.handshake.headers['cookie']);
     //1.解析socket=>{token:token,socketId:socketId};
     var token=tokenParson(socket);
@@ -59,9 +59,10 @@ io.on('connection',function (socket) {
 
     socket.on('private message',function (id,msg) {
         console.log(msg+' to '+id);
-        // console.log(typeof socket.id);
-        // console.log(typeof id);
-        if(socket.id===id){
+        // console.log(socket.id);
+        // console.log(id);
+        console.log(socket.id==id);
+        if(socket.id==id){
             console.log('equal');
             socket.to(id).emit('private message','to yourself:'+msg);
         }else{

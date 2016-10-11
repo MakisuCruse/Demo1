@@ -246,6 +246,7 @@ function auto1(token, res) {
     console.log(decode);
     // console.log(decode.id+"------"+decode.password);
     //1.首先判断过期没???下面的有问题
+
     if (decode.exp<=Date.now()) {
         console.log('exp???date.now');
         res.cookie('token',-1);
